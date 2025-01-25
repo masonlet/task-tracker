@@ -8,13 +8,12 @@ Date: January 24, 2025
 #include <iostream>
 #include <Windows.h>
 
-const char* regPath = R"(Directory\shell\TaskTracker)";
-const char* cmdPath = R"(Directory\shell\TaskTracker\command)";
+const char* regPath = R"(Directory\shell\)";
 
-bool cmdExists() {
+bool cmdExists(std::string name) {
 	HKEY hKey;
 
-	if (RegOpenKeyExA(HKEY_CLASSES_ROOT, regPath, 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+	if (RegOpenKeyExA(HKEY_CLASSES_ROOT, (std::string(regPath) + '\\' + name).c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
 		RegCloseKey(hKey);
 		return true;
 	}
@@ -22,29 +21,33 @@ bool cmdExists() {
 	return false;
 }
 
-void removeCmd() {
-	RegDeleteKeyA(HKEY_CLASSES_ROOT, cmdPath);
-	RegDeleteKeyA(HKEY_CLASSES_ROOT, regPath);
-	std::cout << "Command Removed\n";
+void removeCmd(std::string name) {
+	RegDeleteKeyA(HKEY_CLASSES_ROOT,(std::string(regPath) + '\\' + name).c_str());
+	std::cout << "Command " + name + " Removed\n";
 }
 
-void addCmd() {
+void addCmd(std::string name) {
 	HKEY hKey;
 	DWORD disposition;
 
-	if (RegCreateKeyExA(HKEY_CLASSES_ROOT, regPath, 0, NULL, 0, KEY_WRITE, NULL, &hKey, &disposition) == ERROR_SUCCESS) {
+	if (RegCreateKeyExA(HKEY_CLASSES_ROOT, (std::string(regPath) + '\\' + name).c_str(), 0, NULL, 0, KEY_WRITE, NULL, &hKey, &disposition) == ERROR_SUCCESS) {
+		RegCloseKey(hKey);
 
-		std::cout << "Command Added\n";
+		std::cout << "Command " + name + " Added\n";
 	} else {
-		std::cout << "Error creating registry key\n";
+		std::cout << "Error creating " +  name + " registry key\n";
 	}
 }
 
 int main() {
-	if (cmdExists()) {	
-		removeCmd();
+	if (cmdExists("Finished") || cmdExists("Unfinished") || cmdExists("Hidden")) {	
+		removeCmd("Finished");
+		removeCmd("Unfinished");
+		removeCmd("Hidden");
 	}
 	else {
-		addCmd();
+		addCmd("Finished");
+		addCmd("Unfinished");
+		addCmd("Hidden");
 	}
 }
