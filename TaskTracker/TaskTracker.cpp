@@ -93,7 +93,7 @@ void addKey() {
 		if (!createKey(folderPath.c_str(), folderKey, disposition)) return;	
 
 		//Sub Key Command
-		std::string cmd = R"(cmd.exe /c (echo [.ShellClassInfo] & echo IconResource=")" + subIcons[i] + R"(",0) > "%1\desktop.ini" && attrib +h +s "%1\desktop.ini" && ie4uinit.exe -show)";
+		std::string cmd = "";
 
 		setValue(folderKey, NULL, cmd.c_str());
 
