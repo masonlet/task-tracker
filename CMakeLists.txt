@@ -5,3 +5,5 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(TaskTracker TaskTracker/TaskTracker.cpp)
 add_executable(Installer Installer/Installer.cpp)
+SET_TARGET_PROPERTIES(TaskTracker PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
+SET_TARGET_PROPERTIES(Installer PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
