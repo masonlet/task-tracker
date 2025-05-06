@@ -1,8 +1,8 @@
 /*
-Program name: Installer
+Program name: Task Tracker Installer
 Purpose: Installs Task Tracker program to a Windows 10 / Windows 11 computer
 Author: Mason L'Etoile
-Date: May 04, 2025
+Date: May 05, 2025
 Version: 1.1.0
 */
 
@@ -14,6 +14,8 @@ Version: 1.1.0
 #include <chrono>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include "tasktracker_data.h"
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -83,10 +85,9 @@ static bool isAdmin() {
 }
 
 /* Registry Functions */
-class RegKey {
+struct RegKey {
 	HKEY hKey = nullptr;
 
-public:
 	RegKey() = default;
     ~RegKey() { 
 		if (hKey) RegCloseKey(hKey);
@@ -168,17 +169,14 @@ static bool createDirectory(const std::filesystem::path& path) {
 	message(L"Folder added at " + path.wstring());
 	return true;
 }
-static bool copyFile(const std::filesystem::path& fromPath, const std::filesystem::path& toPath) {
-	if (!fileExists(fromPath))
-		return error(L"File not found at " + fromPath.wstring(), true);
-	
-	try {
-		std::filesystem::copy_file(fromPath, toPath, std::filesystem::copy_options::overwrite_existing);
-	} catch (const std::filesystem::filesystem_error) {
-		return error(L"Failed to copy executables to " + toPath.wstring());
-	}
+static bool extractTaskTrackerExe(const std::filesystem::path& toPath) {
+	std::ofstream outFile(toPath, std::ios::binary);
+	if (!outFile)
+		return error(L"Failed to create file at " + toPath.wstring());
 
-	message(L"Exe copied to " + toPath.wstring());
+	outFile.write(reinterpret_cast<const char*>(tasktracker_data), tasktracker_data_size);
+	outFile.close();
+
 	return true;
 }
 
@@ -245,8 +243,18 @@ static bool deleteTasktrackerKeys() {
 	return success;
 }
 
+struct COMInitializer {
+	HRESULT result;
+	COMInitializer() { result = CoInitializeEx(NULL, COINIT_MULTITHREADED); }
+	~COMInitializer() { CoUninitialize(); }
+
+	operator HRESULT() const {
+		return result;
+	}
+};
 int wmain() {
-	if (!SUCCEEDED(CoInitializeEx(NULL, COINIT_MULTITHREADED))) 
+	COMInitializer comInitializer;
+	if (FAILED(comInitializer))
 		return error(L"Failed to initialize COM library");
 
 	if (!isAdmin()) {
@@ -255,32 +263,28 @@ int wmain() {
 	}
 
 	if (keyExists(REGISTRY_PATH) || fileExists(FILE_PATH)) {	
-		if (keyExists(REGISTRY_PATH)) 
-			if (!deleteTasktrackerKeys())
-				return error(L"Failed to delete keys", true);
-		
-		message(L"Keys successfully removed");
+		if (keyExists(REGISTRY_PATH) && !deleteTasktrackerKeys()) 
+			return error(L"Failed to delete keys", true);
+		else 
+			message(L"Keys successfully removed");
 
-		if(fileExists(EXE_PATH))
-			if (!deleteFile(EXE_PATH)) 
-				return error(L"Failed to delete executable", true);
+		if (fileExists(EXE_PATH) && !deleteFile(EXE_PATH))
+			return error(L"Failed to delete executable", true);
+		else
+			message(L"Executable successfully deleted");
 
-		if (fileExists(FILE_PATH)) {
-			if (!deleteDirectory(FILE_PATH))
-				return error(L"Failed to remove file", true);
-		}
+		if (fileExists(FILE_PATH) && !deleteDirectory(FILE_PATH)) 
+			return error(L"Failed to remove file", true);
+		else 
+			message(L"File successfully removed");
 
-		message(L"File successfully removed");
 		message(L"Uninstallation Completed", true);
 	} else {
-		if (!createTasktrackerKeys() || 
-			!createDirectory(FILE_PATH) || 
-			!copyFile(std::filesystem::path(EXE_NAME), EXE_PATH))
+		if (!createTasktrackerKeys() || !createDirectory(FILE_PATH) || !extractTaskTrackerExe(EXE_PATH))
 			return error(L"Failed to install", true);
 
 		message(L"Installation Completed", true);
 	}
 
-	CoUninitialize();
 	return EXIT_SUCCESS;
 }
