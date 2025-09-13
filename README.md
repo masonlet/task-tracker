@@ -3,14 +3,21 @@ TaskTracker is a lightweight tool for Windows 10 and 11 that adds task status op
 Easily mark folders as Finished, Hidden, Unfinished, or reset them to the Default icon.<br>
 ⚠️ Icon changes may not appear immediately due to Windows icon cache.<br>
 
-# Features
+## Features
 * Add or remove task status options from the right-click menu
 * Simple install/uninstall using a single installer
-* Instantly mark folder icons with one of four states:
-	* ✅ Finished
-	* 🚫 Hidden
-	* ❌ Unfinished
-	* 📁 Default
+* Instantly mark folder icons with one of four states: 📁 Default ✅ Finished 🚫 Hidden ❌ Unfinished
+
+## Preview
+### Context Menu
+![Context Menu](./Images/Menu.png)
+
+### Folder Tracking Example
+![Example](./Images/Example.png)
+
+## Installation
+Download the latest installer from the [Releases](https://github.com/Masonlet/TaskTracker/releases) page and run it.  
+To uninstall, simply re-run the installer.
 
 ## Building the Project
 To build TaskTracker and Installer from source using CMake:
@@ -33,4 +40,3 @@ cmake ..
 cmake --build .
 ```
 Or open the generated `.sln` file in Visual Studio and build the solution.
-
