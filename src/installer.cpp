@@ -1,5 +1,7 @@
 #pragma comment(lib, "Shell32.lib")
 
+#include "inc/resource.h"
+
 #include <Windows.h>
 #include <Winreg.h>
 #include <shlobj_core.h>
@@ -9,7 +11,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "resource.h"
 
 constexpr std::wstring_view EXE_NAME = L"TaskTracker.exe";
 

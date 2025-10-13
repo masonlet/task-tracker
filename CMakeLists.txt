@@ -1,16 +1,38 @@
 cmake_minimum_required(VERSION 3.10)
-project(TaskTracker)
+
+project(TaskTrackerInstaller)
+
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(TaskTracker tasktracker/tasktracker.cpp)
+set(TASK_NAME TaskTracker)
+set(INSTALL_NAME Installer)
 
-add_executable(Installer installer/installer.cpp installer/tasktracker.rc)
-SET_TARGET_PROPERTIES(Installer PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
+set(TASK_SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+set(TASK_INC_DIR "${CMAKE_SOURCE_DIR}/inc")
 
-add_dependencies(Installer TaskTracker)
+file(GLOB_RECURSE TASK_SRC CONFIGURE_DEPENDS ${TASK_SRC_DIR}/tasktracker.cpp)
+source_group(TREE ${TASK_SRC_DIR} PREFIX "Source Files" FILES ${TASK_SRC})
 
-add_custom_command(TARGET TaskTracker POST_BUILD
+add_executable(${TASK_NAME} ${TASK_SRC})
+target_include_directories(${TASK_NAME} PRIVATE ${TASK_INC_DIR})
+
+file(GLOB_RECURSE INSTALL_SRC CONFIGURE_DEPENDS 
+  ${TASK_SRC_DIR}/installer.cpp 
+  ${TASK_SRC_DIR}/tasktracker.rc
+)
+source_group(TREE ${TASK_SRC_DIR} PREFIX "Source Files" FILES ${INSTALL_SRC})
+
+add_executable(${INSTALL_NAME} ${INSTALL_SRC})
+target_include_directories(${INSTALL_NAME} PRIVATE ${TASK_INC_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+
+SET_TARGET_PROPERTIES(${INSTALL_NAME} PROPERTIES 
+  LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE"
+)
+
+add_dependencies(${INSTALL_NAME} ${TASK_NAME})
+
+add_custom_command(TARGET ${TASK_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy 
-        $<TARGET_FILE:TaskTracker>
-        ${CMAKE_SOURCE_DIR}/installer/tasktracker.exe
+        $<TARGET_FILE:${TASK_NAME}>
+        ${TASK_SRC_DIR}/tasktracker.exe
 )
