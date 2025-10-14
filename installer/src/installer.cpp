@@ -1,6 +1,6 @@
 #pragma comment(lib, "Shell32.lib")
 
-#include "inc/resource.h"
+#include "resource.h"
 
 #include <Windows.h>
 #include <Winreg.h>
