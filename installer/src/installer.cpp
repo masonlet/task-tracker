@@ -1,6 +1,7 @@
 #pragma comment(lib, "Shell32.lib")
 
 #include "resource.h"
+#include "log.hpp"
 
 #include <Windows.h>
 #include <Winreg.h>
@@ -8,7 +9,6 @@
 #include <filesystem>
 #include <array>
 #include <chrono>
-#include <string>
 #include <iostream>
 #include <fstream>
 
@@ -41,23 +41,6 @@ const std::wstring UNFINISHED_CMD_PATH = UNFINISHED_PATH + L"\\command";
 const std::wstring DEFAULT_CMD_PATH    = DEFAULT_PATH    + L"\\command";
 
 /* Helper Functions */
-static bool error(const std::wstring_view& error, const bool pause = false) {
-	std::wcout << L"TaskTracker Installer [Error]: " << error << L'\n';
-
-	if (pause) {
-		std::wcout << L"Press Enter to continue...";
-		std::wcin.get();
-	}
-	return false;
-}
-static void message(const std::wstring_view& message, const bool pause = false) {
-	std::wcout << L"TaskTracker Installer [Info]: " << message << L'\n';
-
-	if (pause) {
-		std::wcout << L"Press Enter to continue...";
-		std::wcin.get();
-	}
-}
 static bool isAdmin() {
 	bool isElevated{ false };
 	HANDLE hToken{ nullptr };

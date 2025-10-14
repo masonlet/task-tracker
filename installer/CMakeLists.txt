@@ -15,7 +15,9 @@ file(GLOB_RECURSE INSTALL_INC CONFIGURE_DEPENDS
 add_executable(${INSTALL_NAME} ${INSTALL_SRC} ${INSTALL_INC})
 
 add_dependencies(${INSTALL_NAME} TaskTracker)
+
 target_include_directories(${INSTALL_NAME} PRIVATE ${INSTALL_INC_DIR})
+target_link_libraries(${INSTALL_NAME} PRIVATE Shared)
 
 SET_TARGET_PROPERTIES(${INSTALL_NAME} PROPERTIES 
   LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE"
