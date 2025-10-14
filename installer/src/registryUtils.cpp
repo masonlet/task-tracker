@@ -32,8 +32,8 @@ bool createRegistryKey(const HKEY hKey, const std::wstring& path, RegKey& hKeyHa
 		? log(L"Failed to create registry key " + std::to_wstring(result) + L" at " + path, true)
 		: log(L"Created key at " + path);
 }
-bool setRegistryValue(RegKey& hKey, const std::wstring& valueName, const std::wstring& value) {
-	LONG result = RegSetValueExW(hKey, valueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(value.c_str()), static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t)));
+bool setRegistryValue(RegKey& hKey, const std::wstring_view& valueName, const std::wstring_view& value) {
+	LONG result = RegSetValueExW(hKey, valueName.data(), 0, REG_SZ, reinterpret_cast<const BYTE*>(value.data()), static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t)));
 	return (result != ERROR_SUCCESS)
 		? log(L"Failed to set registry value " + std::to_wstring(result), true)
 		: true;
@@ -88,7 +88,7 @@ bool createTaskTrackerKeys() {
 			return error(L"Failed to set Registry subkey " + folderPath.wstring() + L" command");
 	}
 
-	return log(L"Program Keys Added");
+	return log(L"Program keys successfully added");
 }
 bool deleteTaskTrackerKeys() {
 	bool success{ true };
@@ -97,6 +97,6 @@ bool deleteTaskTrackerKeys() {
 	success &= deleteKey(REGISTRY_PATH);
 
 	return success 
-		? log(L"Program Keys Removed") 
+		? log(L"Program Keys successfully removed") 
 		: error(L"Partial / Entire failure of program key removal");
 }

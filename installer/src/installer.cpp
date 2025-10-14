@@ -43,21 +43,20 @@ int wmain() {
 	if (keyExists(REGISTRY_PATH) || fileExists(FILE_PATH)) {	
 		if (keyExists(REGISTRY_PATH) && !deleteTaskTrackerKeys()) 
 			return error(L"Failed to delete keys");
-		else log(L"Keys successfully removed");
 
 		if (fileExists(EXE_PATH) && !deleteFile(EXE_PATH))
 			return error(L"Failed to delete executable");
-		else log(L"Executable successfully deleted");
 
 		if (fileExists(FILE_PATH) && !deleteDirectory(FILE_PATH)) 
 			return error(L"Failed to remove file");
-		else log(L"File successfully removed");
 
+		log(L"File and executable deleted successfully");
 		log(L"Uninstallation Completed", true);
 	} else {
 		if (!createTaskTrackerKeys() || !createDirectory(FILE_PATH) || !extractTaskTrackerExe(EXE_PATH))
 			return error(L"Failed to install");
 
+		log(L"File and executable created successfully");
 		log(L"Installation Completed", true);
 	}
 
