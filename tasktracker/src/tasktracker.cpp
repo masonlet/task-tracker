@@ -16,7 +16,7 @@ static int exitAndRefresh(const Path& path) {
 	SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_PATHW | SHCNF_FLUSH, path.c_str(), NULL);
 	SHChangeNotify(SHCNE_ATTRIBUTES, SHCNF_PATHW | SHCNF_FLUSH, path.c_str(), NULL);
 
-	SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, reinterpret_cast<LPARAM>("Environment"), SMTO_ABORTIFHUNG, 5000, NULL);
+	SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, reinterpret_cast<LPARAM>(L"Environment"), SMTO_ABORTIFHUNG, 5000, NULL);
 
 	SHFlushSFCache();
 
@@ -27,36 +27,35 @@ static int exitAndRefresh(const Path& path) {
 int wmain(int argc, wchar_t* argv[]){
 	if (argc != 3) return error(L"Invalid argument amount\nUsage: TaskTracker.exe <folder_path> <icon_path>");
 
-	const Path folderPath{ argv[1] };
-	if (!fileExists(folderPath) || !isDirectory(folderPath)) 
-		return error(L"Folder path \"" + folderPath.wstring() + L"\" is invalid");
+	const Path& folder{ argv[1] };
+	if (!fileExists(folder, true) || !isDirectory(folder))
+		return error(L"Folder path \"" + folder.wstring() + L"\" is invalid");
 
-	const Path desktopIniPath{ folderPath / "desktop.ini" };
-	if (fileExists(desktopIniPath)) {
-		SetFileAttributesW(desktopIniPath.c_str(), FILE_ATTRIBUTE_NORMAL);
-		DeleteFileW(desktopIniPath.c_str());
-	} 
+	const Path desktopIni{ folder / "desktop.ini" };
+	if (fileExists(desktopIni, true)) {
+		SetFileAttributesW(desktopIni.c_str(), FILE_ATTRIBUTE_NORMAL);
+		deleteFile(desktopIni.c_str());
+	}
 
-	const Path iconPath{ argv[2] };
-	if (iconPath.wstring() == L"C:\\Windows\\System32\\shell32.dll,-4")
-		return exitAndRefresh(folderPath);
+	const Path& icon{ argv[2] };
+	if (icon.wstring() == L"C:\\Windows\\System32\\shell32.dll,-4")
+		return exitAndRefresh(folder);
 
-	std::ofstream desktopIniFile(desktopIniPath);
-	if (!desktopIniFile) return error(L"Failed to create desktopIni file at " + desktopIniPath.wstring());
+	std::ofstream desktopIniFile(desktopIni);
+	if (!desktopIniFile) return error(L"Failed to create desktopIni file at " + desktopIni.wstring());
 	
 	desktopIniFile << "[.ShellClassInfo]\n" 
-				   << "IconResource=" << iconPath.string() << '\n'
-				   << "[ViewState]\n"
-				   << "Mode=\n"
-				   << "Vid=\n"
-				   << "FolderType=Generic\n";
+								 << "IconResource=" << icon.string() << '\n'
+								 << "[ViewState]\n"
+								 << "Mode=\n"
+								 << "Vid=\n"
+								 << "FolderType=Generic\n";
 	desktopIniFile.close();
 
-	if (!SetFileAttributesW(folderPath.c_str(), FILE_ATTRIBUTE_SYSTEM)) 
+	if (!SetFileAttributesW(folder.c_str(), FILE_ATTRIBUTE_SYSTEM))
 		return error(L"Failed to set folder attributes");
-
-	if (!SetFileAttributesW(desktopIniPath.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)) 
+	if (!SetFileAttributesW(desktopIni.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
 		return error(L"Failed to set desktop.ini attributes");
 
-	return exitAndRefresh(folderPath);
+	return exitAndRefresh(folder);
 }

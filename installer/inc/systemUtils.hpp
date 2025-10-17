@@ -27,12 +27,17 @@ struct SubKey {
 };
 
 struct COMInitializer {
-	HRESULT result;
-	COMInitializer() { result = CoInitializeEx(NULL, COINIT_MULTITHREADED); }
+	COMInitializer() {
+		if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
+			throw std::runtime_error("COM initializer failed");
+	}
 	~COMInitializer() { CoUninitialize(); }
-
-	operator HRESULT() const { return result; }
 };
 
-Path getProgramFilesPath();
 bool isAdmin();
+
+constexpr std::wstring_view EXE_NAME = L"TaskTracker.exe";
+
+Path getProgramFilesPath();
+inline Path getFilePath() { return getProgramFilesPath() / "Task Tracker"; }
+inline Path getExePath() { return getFilePath() / EXE_NAME; }

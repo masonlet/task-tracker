@@ -10,11 +10,6 @@ const std::wstring HIDDEN_PATH = SHELL_PATH + L"\\Hidden";
 const std::wstring UNFINISHED_PATH = SHELL_PATH + L"\\Unfinished";
 const std::wstring DEFAULT_PATH = SHELL_PATH + L"\\Default";
 
-const std::wstring FINISHED_CMD_PATH = FINISHED_PATH + L"\\command";
-const std::wstring HIDDEN_CMD_PATH = HIDDEN_PATH + L"\\command";
-const std::wstring UNFINISHED_CMD_PATH = UNFINISHED_PATH + L"\\command";
-const std::wstring DEFAULT_CMD_PATH = DEFAULT_PATH + L"\\command";
-
 bool createTaskTrackerKeys() {
 	RegKey hKey{};
 	DWORD disposition{};
@@ -54,7 +49,7 @@ bool createTaskTrackerKeys() {
 			return log(L"Failed to create Registry subkey " + folderPath.wstring(), true);
 
 		//Sub Key Command
-		const std::wstring cmd = L"\"" + EXE_PATH.wstring() + L"\" \"%V\" \"" + subCommand.iconPath + L"\"";
+		const std::wstring cmd{ L"\"" + getExePath().wstring() + L"\" \"%V\" \"" + subCommand.iconPath + L"\"" };
 		if (!setRegistryValue(folderKey, L"", cmd)) 
 			return log(L"Failed to set Registry subkey " + folderPath.wstring() + L" command", true);
 	}
@@ -74,7 +69,7 @@ bool deleteTaskTrackerKeys() {
 
 bool registryKeyExists(const std::wstring& path) {
 	return RegOpenKeyExW(HKEY_CLASSES_ROOT, path.data(), 0, KEY_READ, &RegKey{}) != ERROR_SUCCESS
-		? log(L"Key not found at " + path, true)
+		? log(L"Key not found at " + path, true) 
 		: log(L"Key found at " + path);
 }
 bool createRegistryKey(const HKEY hKey, const std::wstring& path, RegKey& hKeyHandle, DWORD& disposition) {

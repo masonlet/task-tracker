@@ -8,42 +8,42 @@
 #include <fstream>
 
 bool isTaskTrackerInstalled() {
-	return registryKeyExists(REGISTRY_PATH) || fileExists(FILE_PATH);
+	return registryKeyExists(REGISTRY_PATH) || fileExists(getFilePath(), true);
 }
+
 bool extractTaskTrackerExe(const Path& toPath) {
-	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(TASKTRACKER_EXE), RT_RCDATA);
-	if (!hResource) return error(L"Failed to find TaskTracker.exe resource");
+	HRSRC resource = FindResource(NULL, MAKEINTRESOURCE(TASKTRACKER_EXE), RT_RCDATA);
+	if (!resource) return error(L"Failed to find TaskTracker.exe resource");
 
-	HGLOBAL hLoadedResource = LoadResource(NULL, hResource);
-	if (!hLoadedResource) return error(L"Failed to load TaskTracker.exe resource");
+	HGLOBAL resourceLoaded = LoadResource(NULL, resource);
+	if (!resourceLoaded) return error(L"Failed to load TaskTracker.exe resource");
 
-	const void* pResourceData = LockResource(hLoadedResource);
-	if (!pResourceData) return error(L"Failed to lock TaskTracker.exe resource");
+	LPVOID resourceData = LockResource(resourceLoaded);
+	if (!resourceData) return error(L"Failed to lock TaskTracker.exe resource");
 
-	DWORD resourceSize = SizeofResource(NULL, hResource);
+	DWORD resourceSize = SizeofResource(NULL, resource);
 	if (resourceSize == 0) return error(L"TaskTracker.exe resource has zero size");
 
 	std::ofstream outFile(toPath, std::ios::binary);
 	if (!outFile) return error(L"Failed to create file at " + toPath.wstring());
 
-	outFile.write(static_cast<const char*>(pResourceData), resourceSize);
+	outFile.write(static_cast<const char*>(resourceData), resourceSize);
 	outFile.close();
 	return outFile.good()
 		? log(L"Successfully extracted TaskTracker.exe to " + toPath.wstring())
-		: log(L"Failed to write TaskTracker.exe to " + toPath.wstring(), true);
+		: log(L"Failed to extract TaskTracker.exe to " + toPath.wstring(), true);
 }
 
 int deleteTaskTracker() {
 	if (registryKeyExists(REGISTRY_PATH) && !deleteTaskTrackerKeys())
 		return error(L"Failed to delete keys");
 
-	if (fileExists(EXE_PATH) && !deleteFile(EXE_PATH))
-		return error(L"Failed to delete executable");
+	if (fileExists(getExePath(), true) && !deleteFile(getExePath()))
+		return error(L"Failed to delete executable at " + getExePath().wstring());
 
-	if (fileExists(FILE_PATH) && !deleteDirectory(FILE_PATH))
-		return error(L"Failed to remove file");
+	if (fileExists(getFilePath(), true) && !deleteDirectory(getFilePath()))
+		return error(L"Failed to delete directory at " + getFilePath().wstring());
 
-	log(L"File and executable deleted successfully");
 	return success(L"Uninstallation Completed");
 }
 
@@ -51,12 +51,11 @@ int installTaskTracker() {
 	if (!createTaskTrackerKeys())
 		return error(L"Failed to create Task Tracker Keys");
 
-	if (!createDirectory(FILE_PATH))
+	if (!createDirectory(getFilePath()))
 		return error(L"Failed to create Task Tracker Directory");
 
-	if (!extractTaskTrackerExe(EXE_PATH))
+	if (!extractTaskTrackerExe(getExePath()))
 		return error(L"Failed to extract Task Tracker EXE");
 
-	log(L"File and executable created successfully");
 	return success(L"Installation Completed");
 }
