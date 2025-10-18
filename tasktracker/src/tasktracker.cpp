@@ -28,7 +28,7 @@ int wmain(int argc, wchar_t* argv[]){
 	if (argc != 3) return error(L"Invalid argument amount\nUsage: TaskTracker.exe <folder_path> <icon_path>");
 
 	const Path& folder{ argv[1] };
-	if (!fileExists(folder, true) || !isDirectory(folder))
+	if (!fileExists(folder, true) || !isDirectory(folder, true))
 		return error(L"Folder path \"" + folder.wstring() + L"\" is invalid");
 
 	const Path desktopIni{ folder / "desktop.ini" };

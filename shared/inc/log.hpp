@@ -2,7 +2,8 @@
 
 #include <string>
 
-bool log(const std::wstring_view& message, const bool error = false, const bool pause = false);
+bool logInfo(const std::wstring_view& message, const bool ret = true);
+bool logError(const std::wstring_view& message, const bool pause = false);
 
 int success(const std::wstring_view& message);
 int error(const std::wstring_view& message);

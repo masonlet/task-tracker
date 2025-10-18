@@ -4,7 +4,7 @@
 bool isAdmin() {
 	HANDLE hToken{ nullptr };
 	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
-		return log(L"OpenProcessTokenFailed", true);
+		return logError(L"OpenProcessTokenFailed");
 
 	TOKEN_ELEVATION elevation{};
 	DWORD returnSize = sizeof(TOKEN_ELEVATION);

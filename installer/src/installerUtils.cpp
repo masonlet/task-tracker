@@ -8,7 +8,10 @@
 #include <fstream>
 
 bool isTaskTrackerInstalled() {
-	return registryKeyExists(REGISTRY_PATH) || fileExists(getFilePath(), true);
+	const bool installed{ registryKeyExists(REGISTRY_PATH) || fileExists(getFilePath(), true) };
+	if(installed) logInfo(L"Uninstalling Task Tracker\n");
+	else          logInfo(L"Installing Task Tracker\n");
+	return installed;
 }
 
 bool extractTaskTrackerExe(const Path& toPath) {
@@ -30,18 +33,18 @@ bool extractTaskTrackerExe(const Path& toPath) {
 	outFile.write(static_cast<const char*>(resourceData), resourceSize);
 	outFile.close();
 	return outFile.good()
-		? log(L"Successfully extracted TaskTracker.exe to " + toPath.wstring())
-		: log(L"Failed to extract TaskTracker.exe to " + toPath.wstring(), true);
+		? logInfo(L"Successfully extracted TaskTracker.exe to " + toPath.wstring() + L'\n')
+		: logError(L"Failed to extract TaskTracker.exe to " + toPath.wstring() + L'\n');
 }
 
 int deleteTaskTracker() {
-	if (registryKeyExists(REGISTRY_PATH) && !deleteTaskTrackerKeys())
+	if (!deleteTaskTrackerKeys())
 		return error(L"Failed to delete keys");
 
-	if (fileExists(getExePath(), true) && !deleteFile(getExePath()))
+	if (!deleteFile(getExePath()))
 		return error(L"Failed to delete executable at " + getExePath().wstring());
 
-	if (fileExists(getFilePath(), true) && !deleteDirectory(getFilePath()))
+	if (!deleteDirectory(getFilePath()))
 		return error(L"Failed to delete directory at " + getFilePath().wstring());
 
 	return success(L"Uninstallation Completed");
