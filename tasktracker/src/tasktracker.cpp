@@ -34,7 +34,8 @@ int wmain(int argc, wchar_t* argv[]){
 	const Path desktopIni{ folder / "desktop.ini" };
 	if (fileExists(desktopIni, true)) {
 		SetFileAttributesW(desktopIni.c_str(), FILE_ATTRIBUTE_NORMAL);
-		deleteFile(desktopIni.c_str());
+		if (!deleteFile(desktopIni.c_str()))
+			return error(L"Failed to delete desktop.ini file");
 	}
 
 	const Path& icon{ argv[2] };

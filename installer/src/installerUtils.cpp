@@ -35,6 +35,18 @@ bool extractTaskTrackerExe(const Path& toPath) {
 		? logInfo(L"Successfully extracted TaskTracker.exe to " + toPath.wstring() + L'\n')
 		: logError(L"Failed to extract TaskTracker.exe to " + toPath.wstring() + L'\n');
 }
+int installTaskTracker() {
+	if (!createTaskTrackerKeys())
+		return error(L"Failed to create Task Tracker Keys");
+
+	if (!createDirectory(getFilePath()))
+		return error(L"Failed to create Task Tracker Directory");
+
+	if (!extractTaskTrackerExe(getExePath()))
+		return error(L"Failed to extract Task Tracker EXE");
+
+	return success(L"Installation Completed");
+}
 
 int deleteTaskTracker() {
 	if (!deleteTaskTrackerKeys())
@@ -47,17 +59,4 @@ int deleteTaskTracker() {
 		return error(L"Failed to delete directory at " + getFilePath().wstring());
 
 	return success(L"Uninstallation Completed");
-}
-
-int installTaskTracker() {
-	if (!createTaskTrackerKeys())
-		return error(L"Failed to create Task Tracker Keys");
-
-	if (!createDirectory(getFilePath()))
-		return error(L"Failed to create Task Tracker Directory");
-
-	if (!extractTaskTrackerExe(getExePath()))
-		return error(L"Failed to extract Task Tracker EXE");
-
-	return success(L"Installation Completed");
 }

@@ -1,6 +1,16 @@
 #include "systemUtils.hpp"
 #include "log.hpp"
 
+Path getProgramFilesPath() {
+	wchar_t* path{ nullptr };
+	if (FAILED(SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &path)))
+		return L"C:\\Program Files\\";
+
+	Path out(path);
+	CoTaskMemFree(path);
+	return out;
+}
+
 bool isAdmin() {
 	HANDLE hToken{ nullptr };
 	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
@@ -12,14 +22,4 @@ bool isAdmin() {
 
 	if (hToken) CloseHandle(hToken);
 	return elevation.TokenIsElevated;
-}
-
-Path getProgramFilesPath() {
-	wchar_t* path{ nullptr };
-	if (FAILED(SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &path))) 
-		return L"C:\\Program Files\\";
-
-	Path out(path);
-	CoTaskMemFree(path);
-	return out;
 }
