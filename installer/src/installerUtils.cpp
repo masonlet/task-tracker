@@ -8,27 +8,26 @@
 #include <fstream>
 
 bool isTaskTrackerInstalled() {
-	const bool installed{ registryKeyExists(REGISTRY_PATH) || fileExists(getFilePath(), true) };
-	if(installed) logInfo(L"Uninstalling Task Tracker\n");
-	else          logInfo(L"Installing Task Tracker\n");
-	return installed;
+	return registryKeyExists(REGISTRY_PATH) || fileExists(getFilePath(), true)
+		? logInfo(L"Uninstalling Task Tracker\n") 
+		: logInfo(L"Installing Task Tracker\n", false);
 }
 
 bool extractTaskTrackerExe(const Path& toPath) {
 	HRSRC resource = FindResource(NULL, MAKEINTRESOURCE(TASKTRACKER_EXE), RT_RCDATA);
-	if (!resource) return error(L"Failed to find TaskTracker.exe resource");
+	if (!resource) return logError(L"Failed to find TaskTracker.exe resource");
 
 	HGLOBAL resourceLoaded = LoadResource(NULL, resource);
-	if (!resourceLoaded) return error(L"Failed to load TaskTracker.exe resource");
+	if (!resourceLoaded) return logError(L"Failed to load TaskTracker.exe resource");
 
 	LPVOID resourceData = LockResource(resourceLoaded);
-	if (!resourceData) return error(L"Failed to lock TaskTracker.exe resource");
+	if (!resourceData) return logError(L"Failed to lock TaskTracker.exe resource");
 
 	DWORD resourceSize = SizeofResource(NULL, resource);
-	if (resourceSize == 0) return error(L"TaskTracker.exe resource has zero size");
+	if (resourceSize == 0) return logError(L"TaskTracker.exe resource has zero size");
 
 	std::ofstream outFile(toPath, std::ios::binary);
-	if (!outFile) return error(L"Failed to create file at " + toPath.wstring());
+	if (!outFile) return logError(L"Failed to create file at " + toPath.wstring());
 
 	outFile.write(static_cast<const char*>(resourceData), resourceSize);
 	outFile.close();

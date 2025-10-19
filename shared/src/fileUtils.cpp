@@ -46,7 +46,7 @@ bool deleteDirectory(const Path& path) {
 }
 bool createDirectory(const Path& path) {
 	if (!fileExists(path, true) && !std::filesystem::create_directories(path))
-		return error(L"Failed to create TaskTracker folder at " + path.wstring());
+		return logError(L"Failed to create TaskTracker folder at " + path.wstring());
 
 	return fileExists(path, false)
 		? logInfo(L"Folder added at " + path.wstring())
