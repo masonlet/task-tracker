@@ -20,4 +20,8 @@ namespace TaskTracker::SystemUtils {
 	inline Path getExePath() { return getFilePath() / EXE_NAME; }
 
 	bool isAdmin();
+
+	int exitAndRefresh(const Path& path);
+	bool isValidPath(const Path& path);
+	bool deleteDesktopIni(const Path& path);
 }

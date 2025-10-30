@@ -1,52 +1,29 @@
 #pragma comment(lib, "Shell32.lib")
 
-#include "fileUtils.hpp"
+#include "systemUtils.hpp"
 #include "log.hpp"
 
 #include <fstream>
 #include <shlobj.h>
 
-namespace TaskTracker {
-	static int exitAndRefresh(const Path& path) {
-		//a lot of this is probably redundant, windows does not like refreshing and I do not like hard restarting explorer so it takes a long time
-		system("ie4uinit.exe -ClearIconCache");
-
-		SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_PATHW, path.c_str(), NULL);
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
-
-		SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_PATHW | SHCNF_FLUSH, path.c_str(), NULL);
-		SHChangeNotify(SHCNE_ATTRIBUTES, SHCNF_PATHW | SHCNF_FLUSH, path.c_str(), NULL);
-
-		SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, reinterpret_cast<LPARAM>(L"Environment"), SMTO_ABORTIFHUNG, 5000, NULL);
-
-		SHFlushSFCache();
-
-		system("ie4uinit.exe -show");
-		return EXIT_SUCCESS;
-	}
-}
-
 int wmain(int argc, wchar_t* argv[]){
 	if (argc != 3) return TaskTracker::Log::exitError(L"Invalid argument amount\nUsage: TaskTracker.exe <folder_path> <icon_path>");
 
 	const TaskTracker::Path& folder{ argv[1] };
-	if (!TaskTracker::FileUtils::fileExists(folder, true) 
-	 || !TaskTracker::FileUtils::isDirectory(folder, true)
-	) return TaskTracker::Log::exitError(L"Folder path \"" + folder.wstring() + L"\" is invalid");
+	if (!TaskTracker::SystemUtils::isValidPath(folder)) 
+		return TaskTracker::Log::exitError(L"Failed to set folder icon");
 
 	const TaskTracker::Path desktopIni{ folder / "desktop.ini" };
-	if (TaskTracker::FileUtils::fileExists(desktopIni, true)) {
-		SetFileAttributesW(desktopIni.c_str(), FILE_ATTRIBUTE_NORMAL);
-		if (!TaskTracker::FileUtils::deleteFile(desktopIni.c_str()))
-			return TaskTracker::Log::exitError(L"Failed to delete desktop.ini file");
-	}
+	if (!TaskTracker::SystemUtils::deleteDesktopIni(desktopIni))
+		return TaskTracker::Log::exitError(L"Failed to delete desktop.ini file");
 
 	const TaskTracker::Path& icon{ argv[2] };
 	if (icon.wstring() == L"C:\\Windows\\System32\\shell32.dll,-4")
-		return TaskTracker::exitAndRefresh(folder);
+		return TaskTracker::SystemUtils::exitAndRefresh(folder);
 
 	std::wofstream desktopIniFile(desktopIni);
-	if (!desktopIniFile) return TaskTracker::Log::exitError(L"Failed to create desktopIni file at " + desktopIni.wstring());
+	if (!desktopIniFile) 
+		return TaskTracker::Log::exitError(L"Failed to create desktopIni file at " + desktopIni.wstring());
 	
 	desktopIniFile << L"[.ShellClassInfo]\n" 
 								 << L"IconResource=" << icon.wstring() << L'\n'
@@ -61,5 +38,5 @@ int wmain(int argc, wchar_t* argv[]){
 	if (!SetFileAttributesW(desktopIni.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
 		return TaskTracker::Log::exitError(L"Failed to set desktop.ini attributes");
 
-	return TaskTracker::exitAndRefresh(folder);
+	return TaskTracker::SystemUtils::exitAndRefresh(folder);
 }
