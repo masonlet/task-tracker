@@ -1,5 +1,5 @@
-# TaskTracker
-TaskTracker is a lightweight tool for Windows 10 and 11 that adds task status options to the right-click context menu of folders.<br>
+# Task Tracker
+Task Tracker is a lightweight tool for Windows 10 and 11 that adds task status options to the right-click context menu of folders.<br>
 Easily mark folders as Finished, Hidden, Unfinished, or reset them to the Default icon.<br>
 ⚠️ Icon changes may not appear immediately due to Windows icon cache.<br>
 
@@ -16,7 +16,7 @@ Easily mark folders as Finished, Hidden, Unfinished, or reset them to the Defaul
 ![Example](./images/example.png)
 
 ## Installation
-Download the latest installer from the [Releases](https://github.com/Masonlet/TaskTracker/releases) page and run it.  
+Download the latest installer from the [Releases](https://github.com/masonlet/task-tracker/releases) page and run it.  
 To uninstall, simply re-run the installer.
 
 ## Building the Project
@@ -24,8 +24,8 @@ To build TaskTracker and Installer from source using CMake:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Masonlet/TaskTracker.git
-cd TaskTracker
+git clone https://github.com/masonlet/task-tracker.git
+cd task-tracker
 ```
 
 ### 2. Create a Build Directory and Generate Build Files
