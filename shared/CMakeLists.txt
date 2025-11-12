@@ -10,9 +10,9 @@ file(GLOB_RECURSE SHARED_SRC CONFIGURE_DEPENDS
   ${SHARED_SRC_DIR}/*.cpp
 )
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/inc PREFIX "Header Files" FILES ${SHARED_INC})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${SHARED_SRC})
+source_group(TREE ${SHARED_INC_DIR} PREFIX "Header Files" FILES ${SHARED_INC})
+source_group(TREE ${SHARED_SRC_DIR} PREFIX "Source Files" FILES ${SHARED_SRC})
 
-add_library(Shared STATIC ${SHARED_INC} ${SHARED_SRC})
+add_library(shared STATIC ${SHARED_INC} ${SHARED_SRC})
 
-target_include_directories(Shared PUBLIC ${SHARED_INC_DIR})
+target_include_directories(shared PUBLIC ${SHARED_INC_DIR})

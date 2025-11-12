@@ -1,7 +1,7 @@
-#include "installerUtils.hpp"
+#include "installer_utils.hpp"
 
-#include "registryUtils.hpp"
-#include "fileUtils.hpp"
+#include "registry_utils.hpp"
+#include "file_utils.hpp"
 #include "resource.h"
 #include "log.hpp"
 

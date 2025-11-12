@@ -1,5 +1,5 @@
-#include "registryUtils.hpp"
-#include "systemUtils.hpp"
+#include "registry_utils.hpp"
+#include "system_utils.hpp"
 #include "log.hpp"
 
 #include <array>

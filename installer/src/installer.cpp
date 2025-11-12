@@ -1,5 +1,5 @@
-#include "systemUtils.hpp"
-#include "installerUtils.hpp"
+#include "system_utils.hpp"
+#include "installer_utils.hpp"
 #include "log.hpp"
 
 int wmain() {

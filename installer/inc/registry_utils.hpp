@@ -1,7 +1,7 @@
 #pragma once
 
-#include "filePath.h"
-#include "systemUtils.hpp"
+#include "file_path.h"
+#include "system_utils.hpp"
 
 #include <string>
 #include <filesystem>

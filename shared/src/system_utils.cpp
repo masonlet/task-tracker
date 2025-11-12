@@ -1,5 +1,5 @@
-#include "systemUtils.hpp"
-#include "fileUtils.hpp"
+#include "system_utils.hpp"
+#include "file_utils.hpp"
 #include "log.hpp"
 
 namespace TaskTracker::SystemUtils {

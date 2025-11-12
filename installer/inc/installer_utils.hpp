@@ -1,6 +1,6 @@
 #pragma once
 
-#include "filePath.h"
+#include "file_path.h"
 
 namespace TaskTracker::Installer {
 	bool isTaskTrackerInstalled();

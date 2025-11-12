@@ -1,8 +1,8 @@
-#include "taskTrackerUtils.hpp"
+#include "tasktracker_utils.hpp"
 
 #pragma comment(lib, "Shell32.lib")
 
-#include "systemUtils.hpp"
+#include "system_utils.hpp"
 #include "log.hpp"
 
 #include <fstream>
